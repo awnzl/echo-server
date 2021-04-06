@@ -10,8 +10,8 @@ type Config struct {
 	LogLevel string
 }
 
-func Get() (Config, error) {
-	if err := godotenv.Load(); err != nil {
+func Get(envFile string) (Config, error) {
+	if err := godotenv.Load(envFile); err != nil {
 		return Config{}, err
 	}
 

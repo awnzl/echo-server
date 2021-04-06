@@ -12,7 +12,7 @@ import (
 )
 
 type requestData struct {
-	Word string `json: word`
+	Word string `json:"word"`
 }
 
 type Server struct {
@@ -43,7 +43,7 @@ func (s *Server) Run(port string) error {
 		return fmt.Errorf("server isn't initialized")
 	}
 
-	return http.ListenAndServe(":"+port, s.router)
+	return http.ListenAndServe(fmt.Sprintf(":%v", port), s.router)
 }
 
 func (s *Server) name(w http.ResponseWriter, r *http.Request) {

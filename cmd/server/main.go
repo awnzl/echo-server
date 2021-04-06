@@ -2,19 +2,18 @@ package main
 
 import (
 	"fmt"
-
 	"github.com/awnzl/echo-server/internal/config"
 	"github.com/awnzl/echo-server/internal/logger"
 	"github.com/awnzl/echo-server/internal/server"
+	"log"
 )
 
+const envFilepath = "../.env"
+
 func main() {
-	conf, err := config.Get()
+	conf, err := config.Get(envFilepath)
 	if err != nil {
-		conf = config.Config{
-			Port:     "8080",
-			LogLevel: "info",
-		}
+		log.Fatal(err)
 	}
 
 	log := logger.NewZap(conf.LogLevel)
@@ -22,6 +21,6 @@ func main() {
 
 	s := server.New(log)
 	if err := s.Run(conf.Port); err != nil {
-		fmt.Println("Server run failure", err)
+		log.Fatal(fmt.Sprintf("Server run failure: %v", err))
 	}
 }

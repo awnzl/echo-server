@@ -6,7 +6,7 @@ CMD		:= $(GOBASE)/cmd
 GOBIN	:= $(GOBASE)/bin
 
 APPS	:= $(notdir $(wildcard $(CMD)/*))
-TESTS	:= $(GOBASE)/internal/*
+TESTS	:= $(GOBASE)/internal/...
 
 define BUILD
 $(GOBUILD) -o $(GOBIN)/$(1) $(CMD)/$(1)/*.go
