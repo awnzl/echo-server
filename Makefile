@@ -7,6 +7,7 @@ GOBIN	:= $(GOBASE)/bin
 
 APPS	:= $(notdir $(wildcard $(CMD)/*))
 TESTS	:= $(GOBASE)/internal/...
+DEVENV  := $(GOBASE)/.env
 
 define BUILD
 $(GOBUILD) -o $(GOBIN)/$(1) $(CMD)/$(1)/*.go
@@ -19,6 +20,7 @@ all: build
 .PHONY: build
 build:
 	$(foreach app,$(APPS),$(call BUILD,$(app)))
+	cp -n -f .env $(GOBIN)
 
 .PHONY: test
 test:

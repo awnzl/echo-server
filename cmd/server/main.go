@@ -3,24 +3,28 @@ package main
 import (
 	"fmt"
 	"github.com/awnzl/echo-server/internal/config"
+	"github.com/awnzl/echo-server/internal/handlers"
 	"github.com/awnzl/echo-server/internal/logger"
-	"github.com/awnzl/echo-server/internal/server"
-	"log"
+	"github.com/gorilla/mux"
+	"go.uber.org/zap"
+	"net/http"
 )
 
-const envFilepath = "../.env"
-
 func main() {
-	conf, err := config.Get(envFilepath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log := logger.NewZap(conf.LogLevel)
+	conf := config.Get()
+	log  := logger.NewZap(conf.LogLevel)
 	defer log.Sync()
 
-	s := server.New(log)
-	if err := s.Run(conf.Port); err != nil {
-		log.Fatal(fmt.Sprintf("Server run failure: %v", err))
+	router   := mux.NewRouter()
+	handlers := handlers.New(log)
+	handlers.RegisterHandlers(router)
+
+	s := &http.Server{
+		Addr: fmt.Sprintf(":%v", conf.Port),
+		Handler: router,
+	}
+
+	if err := s.ListenAndServe(); err != nil {
+		log.Panic("server error", zap.Error(err))
 	}
 }

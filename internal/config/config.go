@@ -10,13 +10,11 @@ type Config struct {
 	LogLevel string
 }
 
-func Get(envFile string) (Config, error) {
-	if err := godotenv.Load(envFile); err != nil {
-		return Config{}, err
-	}
+func Get() Config {
+	_ = godotenv.Load()
 
 	return Config{
 		Port:     os.Getenv("SERVER_PORT"),
 		LogLevel: os.Getenv("LOG_LEVEL"),
-	}, nil
+	}
 }
