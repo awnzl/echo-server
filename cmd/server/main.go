@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/awnzl/echo-server/internal/config"
 	"github.com/awnzl/echo-server/internal/handlers"
 	"github.com/awnzl/echo-server/internal/logger"
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
-	"net/http"
 )
 
 func main() {
