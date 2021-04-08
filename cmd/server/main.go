@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/awnzl/echo-server/internal/config"
-	"github.com/awnzl/echo-server/internal/handlers"
+	"github.com/awnzl/echo-server/internal/endpointhandlers"
 	"github.com/awnzl/echo-server/internal/logger"
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
@@ -17,7 +17,7 @@ func main() {
 	defer log.Sync()
 
 	router   := mux.NewRouter()
-	handlers := handlers.New(log)
+	handlers := endpointhandlers.New(log)
 	handlers.RegisterHandlers(router)
 
 	s := &http.Server{
