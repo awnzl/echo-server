@@ -14,7 +14,7 @@ import (
 	"github.com/awnzl/echo-server/internal/logger"
 )
 
-type testSuite struct{
+type testSuite struct {
 	suite.Suite
 	log      *zap.Logger
 	handlers *Handlers

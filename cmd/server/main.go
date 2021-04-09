@@ -15,10 +15,10 @@ import (
 
 func main() {
 	conf := config.Get()
-	log  := logger.NewZap(conf.LogLevel)
+	log := logger.NewZap(conf.LogLevel)
 	defer log.Sync()
 
-	router       := mux.NewRouter()
+	router := mux.NewRouter()
 	httpHandlers := handlers.New(log)
 	httpHandlers.RegisterHandlers(router)
 
@@ -32,6 +32,7 @@ func main() {
 	}
 
 	log.Info("start listening", zap.String("port", conf.Port))
+
 	if err := s.ListenAndServe(); err != nil {
 		log.Panic("server error", zap.Error(err))
 	}

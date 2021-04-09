@@ -8,12 +8,12 @@ import (
 
 type Logger struct {
 	handler http.Handler
-	logger *zap.Logger
+	logger  *zap.Logger
 }
 
 func NewLogging(log *zap.Logger, handler http.Handler) *Logger {
 	return &Logger{
-		logger: log,
+		logger:  log,
 		handler: handler,
 	}
 }

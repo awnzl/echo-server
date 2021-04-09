@@ -41,9 +41,7 @@ func (h *Handlers) RegisterHandlers(router *mux.Router) {
 }
 
 func (h *Handlers) nameHandler(w http.ResponseWriter, r *http.Request) {
-	resp := nameResponse{
-		ServiceName: "echo-server",
-	}
+	resp := nameResponse{ServiceName: "echo-server"}
 
 	b, err := json.Marshal(resp)
 	if err != nil {
@@ -59,16 +57,16 @@ func (h *Handlers) nameHandler(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handlers) echoHandler(w http.ResponseWriter, r *http.Request) {
 	var requestData echoRequest
+
 	err := json.NewDecoder(r.Body).Decode(&requestData)
 	if err != nil {
 		h.logger.Error(err.Error())
-		h.writeError("user","failed to read request body", http.StatusBadRequest, w)
+		h.writeError("user", "failed to read request body", http.StatusBadRequest, w)
 		return
 	}
 
-	resp := echoResponse{
-		EchoWord: requestData.Word,
-	}
+	resp := echoResponse{EchoWord: requestData.Word}
+
 	b, err := json.Marshal(resp)
 	if err != nil {
 		h.logger.Error(err.Error())
@@ -79,20 +77,6 @@ func (h *Handlers) echoHandler(w http.ResponseWriter, r *http.Request) {
 	if err := h.writeResponse(b, w); err != nil {
 		h.logger.Error(err.Error())
 	}
-}
-
-func (h *Handlers) setRespHeaderJSONMiddleware(handler http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		handler.ServeHTTP(w, r)
-	})
-}
-
-func (h *Handlers) loggingMiddleware(handler http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.logger.Info("Request", zap.String("URI", r.RequestURI), zap.String("Addr", r.RemoteAddr))
-		handler.ServeHTTP(w, r)
-	})
 }
 
 func (h *Handlers) writeResponse(b []byte, w http.ResponseWriter) error {
