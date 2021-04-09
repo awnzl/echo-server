@@ -1,8 +1,7 @@
-package endpointhandlers
+package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -35,7 +34,7 @@ type nameResponse struct{
 func (h *Handler) RegisterHandlers(router *mux.Router) {
 	router.HandleFunc("/", h.nameHandler)
 	router.HandleFunc("/echo", h.echoHandler)
-	router.Use(h.loggingMiddleware, h.setHeaderMiddleware)
+	router.Use(h.loggingMiddleware, h.JSONResponseMiddleware)
 }
 
 func (h *Handler) nameHandler(w http.ResponseWriter, r *http.Request) {
@@ -43,7 +42,7 @@ func (h *Handler) nameHandler(w http.ResponseWriter, r *http.Request) {
 		ServiceName: "echo-server",
 	}
 
-	b, err := h.marshal(resp)
+	b, err := json.Marshal(resp)
 	if err != nil {
 		h.logger.Error(err.Error())
 		h.writeError(
@@ -85,7 +84,7 @@ func (h *Handler) echoHandler(w http.ResponseWriter, r *http.Request) {
 	resp := echoResponse{
 		EchoWord: requestData.Word,
 	}
-	b, err := h.marshal(resp)
+	b, err := json.Marshal(resp)
 	if err != nil {
 		h.logger.Error(err.Error())
 		h.writeError(
@@ -101,7 +100,7 @@ func (h *Handler) echoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handler) setHeaderMiddleware(handler http.Handler) http.Handler {
+func (h *Handler) JSONResponseMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		handler.ServeHTTP(w, r)
@@ -110,18 +109,9 @@ func (h *Handler) setHeaderMiddleware(handler http.Handler) http.Handler {
 
 func (h *Handler) loggingMiddleware(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.logger.Info(fmt.Sprintf("Requested URI: %v, from Remote address: %v", r.RequestURI, r.RemoteAddr))
+		h.logger.Info("Request", zap.String("URI", r.RequestURI), zap.String("Addr", r.RemoteAddr))
 		handler.ServeHTTP(w, r)
 	})
-}
-
-func (h *Handler) marshal(resp interface{}) ([]byte, error) {
-	b, err := json.Marshal(resp)
-	if err != nil {
-		return nil, err
-	}
-
-	return b, nil
 }
 
 func (h *Handler) writeResponse(b []byte, w http.ResponseWriter) error {
@@ -135,7 +125,6 @@ func (h *Handler) writeResponse(b []byte, w http.ResponseWriter) error {
 }
 
 func (h *Handler) writeError(b []byte, status int, w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 
 	if _, err := w.Write(b); err != nil {
