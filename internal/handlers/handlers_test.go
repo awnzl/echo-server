@@ -62,12 +62,17 @@ func (s *testSuite) TestEchoHandler() {
 }
 
 func (s *testSuite) TestEchoHandlerErrorResponse() {
+	want := `{"level":"user","error":"failed to read request body"}`
+
 	w := httptest.NewRecorder()
 	req := httptest.NewRequest("POST", "localhost:8080/echo", nil)
 	s.handlers.echoHandler(w, req)
 
 	res := w.Result()
+	got, err := io.ReadAll(res.Body)
+	s.NoError(err)
 	s.Equal(http.StatusBadRequest, res.StatusCode)
+	s.JSONEq(want, string(got), "Incorrect response")
 }
 
 func TestHandlersTestSuite(t *testing.T) {
