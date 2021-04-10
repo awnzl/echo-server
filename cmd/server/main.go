@@ -20,15 +20,15 @@ func main() {
 
 	router := mux.NewRouter()
 	httpHandlers := handlers.New(log)
-	httpHandlers.RegisterHandlers(router)
-
-	var wrappedRouter http.Handler
-	wrappedRouter = middleware.NewLogging(log, router)
-	wrappedRouter = middleware.NewContentTypeJSON(wrappedRouter)
+	httpHandlers.RegisterHandlers(
+		router,
+		middleware.NewLogger(log).Log,
+		middleware.SetContentTypeJSON,
+	)
 
 	s := &http.Server{
 		Addr:    fmt.Sprintf(":%v", conf.Port),
-		Handler: wrappedRouter,
+		Handler: router,
 	}
 
 	log.Info("start listening", zap.String("port", conf.Port))

@@ -35,9 +35,10 @@ type nameResponse struct {
 	ServiceName string `json:"service_name"`
 }
 
-func (h *Handlers) RegisterHandlers(router *mux.Router) {
+func (h *Handlers) RegisterHandlers(router *mux.Router, mwFuncs ...mux.MiddlewareFunc) {
 	router.HandleFunc("/", h.nameHandler)
 	router.HandleFunc("/echo", h.echoHandler)
+	router.Use(mwFuncs...)
 }
 
 func (h *Handlers) nameHandler(w http.ResponseWriter, r *http.Request) {
